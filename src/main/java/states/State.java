@@ -1,94 +1,95 @@
 package states;
 
-import context.initialisers.Initializer;
-import interaction.interfaces.Interaction;
-import interaction.validators.Validator;
-import utils.StateType;
+import actions.ActionType;
+import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Created by sebastian on 05.12.16.
+ * Created by sebastian on 25.02.17.
  */
 public class State {
-    private final String name;
+//    private static WebDriver webDriver = new ChromeDriver();
+    private final String description;
+    private final String commandForUser;
     private final List<State> childStates;
-    private final Interaction interaction;
-    private final Initializer contextInitializer;
-    private final Validator validator;
-    private final String questionToUser;
-    private final boolean interactive;
-    private final StateType type;
+    private final ActionType actionType;
+    private final boolean finall;
+    private final String informationName;
+    private final Optional<String> contextInformationName;
 
-    State(
-            final String name,
-            final Interaction interaction,
-            final Initializer contextInitialiser,
-            final Validator validator,
-            final String questionToUser,
-            final boolean interactive,
-            final StateType type
+    public State(
+            final String description,
+            final String commandForUser,
+            final ActionType actionType,
+            final String informationName,
+            final boolean finall
     ) {
-        this.name = name;
-        this.childStates = new ArrayList<>();
-        this.interaction = interaction;
-        this.contextInitializer = contextInitialiser;
-        this.validator = validator;
-        this.questionToUser = questionToUser;
-        this.interactive = interactive;
-        this.type = type;
+        this(description, commandForUser, actionType, informationName, finall, Optional.empty());
     }
 
+    public State(
+            final String description,
+            final String commandForUser,
+            final ActionType actionType,
+            final String informationName,
+            final boolean finall,
+            final Optional<String> contextInformationName
+    ) {
+        this.description = description;
+        this.actionType = actionType;
+        this.commandForUser = commandForUser;
+        this.childStates = Lists.newArrayList();
+        this.finall = finall;
+        this.informationName = informationName;
+        this.contextInformationName = contextInformationName;
+    }
 
-    public void addChild(final State state) {
+    public ActionType getActionType() {
+        return actionType;
+    }
+
+    public void addChildState(final State state) {
         childStates.add(state);
     }
 
-    private String getName() {
-        return name;
+    public void addChildStates(final List<State> newChildStates) {
+        childStates.addAll(newChildStates);
     }
 
-    /**
-     * This method is used by state to prepare for interaction with user, run interaction and retrieve
-     * next state to go to.
-     * @return Next state that we need to move to
-     */
-    public State mainMethod() {
-        contextInitializer.initialise();
-        final String interactionResult = interaction.interact(validator, getMessageForUser());
-        if (type == StateType.ACTION) {
-            return childStates.get(0);
-        } else {
-            return childStates.stream().filter(state -> state.getName().equals(interactionResult)).findFirst().orElseGet(null);
+    public List<State> getChildStates() {
+        return childStates;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isFinall() {
+        return finall;
+    }
+
+    public State getChildState(final int stateNumber) {
+        if (stateNumber >= childStates.size()) {
+            throw new RuntimeException("states.State number was bigger than child state list size");
         }
+        return childStates.get(stateNumber);
     }
 
-    private String getMessageForUser() {
-        final StringBuilder builder = new StringBuilder();
-        if (type == StateType.MENU) {
-            childStates.stream()
-                    .map(state -> state.getName() + '\n')
-                    .forEach(builder::append);
-        }
-        builder.append(questionToUser).append('\n');
-        return builder.toString();
+    public String getCommandForUser() {
+        return commandForUser;
     }
 
-    private int getChildsNumber() {
-        return childStates.size();
+    public String getInformationName() {
+        return informationName;
     }
 
-    public boolean hasChildWithName(final String name) {
-        return childStates.stream()
-                .map(State::getName)
-                .filter(stateName -> stateName.equals(name))
-                .findAny()
-                .isPresent();
+    public String getContextInformationName() {
+        return contextInformationName.orElse("");
     }
 
-    public boolean isInteractive() {
-        return interactive;
-    }
+//    public WebDriver getWebDriver() {
+//        return webDriver;
+//    }
 }

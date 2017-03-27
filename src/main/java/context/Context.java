@@ -1,47 +1,31 @@
 package context;
 
-import java.util.Collections;
-import java.util.List;
+import com.google.common.collect.Maps;
+
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Created by sebastian on 06.12.16.
+ * Created by sebastian on 25.02.17.
  */
-
 public class Context {
-    private static Context instance = new Context();
-    private List<String> fieldNames;
-    private int currentField;
-    private Map<String, String> fieldValues;
+    private String contextName;
+    private Map<String, String> contextData;
 
-    private Context() {
-        this.fieldValues = Collections.emptyMap();
-        this.currentField = 0;
-        this.fieldNames = Collections.emptyList();
+    public Context(final String contextName) {
+        this.contextName = contextName;
+        this.contextData = Maps.newHashMap();
     }
 
-    public static Context getInstance() {
-        return instance;
+    public void putData(final String name, final String value) {
+        contextData.put(name, value);
     }
 
-    public void reset() {
-        currentField = 0;
-        fieldNames.clear();
-        fieldValues.clear();
+    public String getData(final String name) {
+        return contextData.get(name);
     }
 
-    public void initialiseContext(final String contextName) {
-        reset();
-        if (contextName.equals("Country Transfer")) {
-            fieldNames.add("Name");
-            fieldNames.add("Surname");
-            fieldNames.add("Account Number");
-        }
-    }
-
-    public void setNextFieldValue(final String value) {
-        final String key = fieldNames.get(currentField);
-        fieldValues.put(key, value);
-        currentField++;
+    public Set<String> getInformationNames() {
+        return contextData.keySet();
     }
 }
