@@ -1,8 +1,6 @@
 package actions;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpPost;
 import speech.recognition.api.SpeechRecognitionResponse;
 
 import java.io.File;
